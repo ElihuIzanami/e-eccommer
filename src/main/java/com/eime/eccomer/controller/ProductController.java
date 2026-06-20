@@ -1,0 +1,70 @@
+package com.eime.eccomer.controller;
+
+import com.eime.eccomer.model.Product;
+import com.eime.eccomer.payload.ProductDTO;
+import com.eime.eccomer.payload.ProductResponse;
+import com.eime.eccomer.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("/api")
+public class ProductController {
+
+    @Autowired
+    private ProductService productService;
+
+    @PostMapping("/admin/categories/{categoryId}/product")
+    public ResponseEntity<ProductDTO> addProducts(@RequestBody ProductDTO productDTO,
+                                                  @PathVariable Long categoryId){
+            ProductDTO savedProductDTO = productService.addProduct(categoryId,productDTO);
+            return new ResponseEntity<>(savedProductDTO, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/public/products")
+    public ResponseEntity<ProductResponse> getAllProducts(){
+        ProductResponse productResponse = productService.getAllProducts();
+        return new ResponseEntity<>(productResponse,HttpStatus.OK);
+    }
+
+    @GetMapping("/public/categories/{categoryId}/products")
+    public ResponseEntity<ProductResponse> getProductsByCategory(@PathVariable Long categoryId){
+         ProductResponse productResponse = productService.searchByCategory(categoryId);
+         return new ResponseEntity<>(productResponse,HttpStatus.OK);
+    }
+
+    @GetMapping("/public/products/keyword/{keyword}")
+    public ResponseEntity<ProductResponse> getProductsByKeyword(@PathVariable String keyword){
+        ProductResponse productResponse = productService.searchProductByKeyword(keyword);
+        return new ResponseEntity<>(productResponse, HttpStatus.FOUND);
+    }
+
+    @PutMapping("/admin/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO,
+                                                    @PathVariable Long productId) {
+        ProductDTO updateProductDTO =  productService.updateProduct(productId,productDTO);
+        return new ResponseEntity<>(updateProductDTO,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/admin/products/{productId}")
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId){
+        ProductDTO deleteProduct = productService.deleteProduct(productId);
+        return new ResponseEntity<>(deleteProduct, HttpStatus.OK);
+    }
+
+
+    @PutMapping(value = "products/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId,
+                                                         @RequestParam("Image")MultipartFile image) {
+
+
+
+        
+    }
+
+}
